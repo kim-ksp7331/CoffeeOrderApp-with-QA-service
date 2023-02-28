@@ -1,7 +1,11 @@
 package orderapp.coffeeorder.member;
 
 import orderapp.coffeeorder.member.entity.Member;
+import orderapp.coffeeorder.member.mapper.MemberMapper;
+import orderapp.coffeeorder.response.MultiResponseDTO;
+import orderapp.coffeeorder.response.SingleResponseDTO;
 import orderapp.coffeeorder.utils.UriCreator;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/members")
@@ -37,20 +42,23 @@ public class MemberController {
         memberPatchDTO.setMemberId(memberId);
         Member member = memberService.updateMember(mapper.memberPatchDTOToMember(memberPatchDTO));
         MemberDTO.Response response = mapper.memberToMemberResponseDTO(member);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
 
     @GetMapping("/{member-id}")
     public ResponseEntity<?> getMember(@PathVariable("member-id") @Positive long memberId) {
         Member member = memberService.findMember(memberId);
         MemberDTO.Response response = mapper.memberToMemberResponseDTO(member);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<?> getMembers() {
-        // TODO Not Implemented
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> getMembers(@RequestParam @Positive int page,
+                                        @RequestParam @Positive int size) {
+        Page<Member> memberPage = memberService.findMembers(page - 1, size);
+        List<Member> members = memberPage.getContent();
+        return new ResponseEntity<>(
+                new MultiResponseDTO<>(mapper.membersToMemberResponseDTOs(members), memberPage), HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
