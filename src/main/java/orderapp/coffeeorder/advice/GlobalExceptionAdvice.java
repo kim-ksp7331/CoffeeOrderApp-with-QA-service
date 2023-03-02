@@ -12,9 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.Set;
 
 @RestControllerAdvice
 @Slf4j
@@ -47,7 +45,7 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler
     public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse response = ErrorResponse.of(status, e.getMessage());
+        ErrorResponse response = ErrorResponse.of(status, e.getMostSpecificCause().toString());
         return new ResponseEntity<>(response, status);
     }
 

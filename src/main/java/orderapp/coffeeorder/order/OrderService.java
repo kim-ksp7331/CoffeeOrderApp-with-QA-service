@@ -1,49 +1,57 @@
 package orderapp.coffeeorder.order;
 
+import lombok.RequiredArgsConstructor;
 import orderapp.coffeeorder.coffee.CoffeeService;
 import orderapp.coffeeorder.exception.BusinessLogicException;
 import orderapp.coffeeorder.exception.ExceptionCode;
 import orderapp.coffeeorder.member.MemberService;
+import orderapp.coffeeorder.member.entity.Member;
+import orderapp.coffeeorder.member.entity.Stamp;
 import orderapp.coffeeorder.order.entity.Order;
-import orderapp.coffeeorder.order.entity.OrderCoffee;
+import orderapp.coffeeorder.utils.CustomBeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final MemberService memberService;
     private final CoffeeService coffeeService;
+    private final CustomBeanUtils<Order> beanUtils;
 
-    public OrderService(OrderRepository orderRepository, MemberService memberService, CoffeeService coffeeService) {
-        this.orderRepository = orderRepository;
-        this.memberService = memberService;
-        this.coffeeService = coffeeService;
-    }
 
     public Order createOrder(Order order) {
-        verifyOrder(order);
+        Member findMember = verifyOrder(order);
         order.getOrderCoffees().stream().forEach(orderCoffee -> orderCoffee.setOrder(order));
+        addStampCount(order, findMember);
         return orderRepository.save(order);
     }
 
-    private void verifyOrder(Order order) {
-        memberService.findVerifiedMember(order.getMember().getMemberId());
+    private Member verifyOrder(Order order) {
+        Member member = memberService.findVerifiedMember(order.getMember().getMemberId());
         order.getOrderCoffees().stream()
                 .forEach(orderCoffee -> coffeeService.findVerifiedCoffee(orderCoffee.getCoffee().getCoffeeId()));
+        return member;
+    }
 
+    private void addStampCount(Order order, Member findMember) {
+        Stamp stamp = findMember.getStamp();
+        int totalCoffeeQuantity = order.getOrderCoffees().stream()
+                .mapToInt(orderCoffee -> orderCoffee.getQuantity()).sum();
+        stamp.setStampCount(stamp.getStampCount() + totalCoffeeQuantity);
     }
 
     public Order updateOrder(Order order) {
         Order findOrder = findVerifiedOrder(order.getOrderId());
-        Optional.ofNullable(order.getOrderStatus()).ifPresent(orderStatus -> findOrder.setOrderStatus(orderStatus));
-        return orderRepository.save(findOrder);
+        Order updatedOrder = beanUtils.copyNonNullProperties(order, findOrder);
+        return orderRepository.save(updatedOrder);
     }
 
     public Order findOrder(long orderId) {

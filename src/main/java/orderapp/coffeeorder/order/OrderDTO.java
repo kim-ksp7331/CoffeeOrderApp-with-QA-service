@@ -9,7 +9,6 @@ import orderapp.coffeeorder.order.entity.Order;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderDTO {
@@ -55,7 +54,6 @@ public class OrderDTO {
         private long memberId;
         private Order.OrderStatus orderStatus;
         private List<OrderCoffee> orderCoffees;
-        private LocalDateTime createdAt;
 
         @Getter
         @AllArgsConstructor

@@ -1,34 +1,40 @@
 package orderapp.coffeeorder.member;
 
+import lombok.RequiredArgsConstructor;
 import orderapp.coffeeorder.exception.BusinessLogicException;
 import orderapp.coffeeorder.exception.ExceptionCode;
 import orderapp.coffeeorder.member.entity.Member;
+import orderapp.coffeeorder.member.entity.Stamp;
+import orderapp.coffeeorder.utils.CustomBeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-
-    public MemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
+    private final CustomBeanUtils<Member> beanUtils;
 
     public Member createMember(Member member) {
         verifyExistsEmail(member.getEmail());
+        setStamp(member);
         return memberRepository.save(member);
+    }
+
+    private void setStamp(Member member) {
+        member.setStamp(new Stamp());
     }
 
     public Member updateMember(Member member) {
         Member findMember = findVerifiedMember(member.getMemberId());
-        Optional.ofNullable(member.getName()).ifPresent(name -> findMember.setName(name));
-        Optional.ofNullable(member.getPhone()).ifPresent(phone -> findMember.setPhone(phone));
-
-        return memberRepository.save(findMember);
+        Member updatedMember = beanUtils.copyNonNullProperties(member, findMember);
+        return memberRepository.save(updatedMember);
     }
 
     public Member findMember(long memberId) {

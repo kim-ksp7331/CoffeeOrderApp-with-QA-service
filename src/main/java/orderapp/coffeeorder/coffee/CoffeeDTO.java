@@ -33,6 +33,7 @@ public class CoffeeDTO {
         private String engName;
         @Range(min = 100, max = 50000)
         private Integer price;
+        private Coffee.CoffeeStatus coffeeStatus;
     }
 
     @Getter
@@ -42,6 +43,7 @@ public class CoffeeDTO {
         private String korName;
         private String engName;
         private Integer price;
+        private Coffee.CoffeeStatus coffeeStatus;
 
     }
 }

@@ -3,6 +3,7 @@ package orderapp.coffeeorder.order.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import orderapp.coffeeorder.audit.Auditable;
 import orderapp.coffeeorder.member.entity.Member;
 
 import javax.persistence.*;
@@ -12,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity(name = "ORDERS")
-public class Order {
+public class Order extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;

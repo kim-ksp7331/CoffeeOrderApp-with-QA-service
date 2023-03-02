@@ -1,21 +1,23 @@
 package orderapp.coffeeorder.coffee;
 
+import lombok.RequiredArgsConstructor;
 import orderapp.coffeeorder.exception.BusinessLogicException;
 import orderapp.coffeeorder.exception.ExceptionCode;
+import orderapp.coffeeorder.utils.CustomBeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class CoffeeService {
     private final CoffeeRepository coffeeRepository;
-
-    public CoffeeService(CoffeeRepository coffeeRepository) {
-        this.coffeeRepository = coffeeRepository;
-    }
+    private final CustomBeanUtils<Coffee> beanUtils;
 
     public Coffee createCoffee(Coffee coffee) {
         verifyExistsCoffee(coffee.getCoffeeCode());
@@ -24,11 +26,8 @@ public class CoffeeService {
 
     public Coffee updateCoffee(Coffee coffee) {
         Coffee findCoffee = findVerifiedCoffee(coffee.getCoffeeId());
-        Optional.ofNullable(coffee.getKorName()).ifPresent(korName -> findCoffee.setKorName(korName));
-        Optional.ofNullable(coffee.getEngName()).ifPresent(engName -> findCoffee.setEngName(engName));
-        Optional.ofNullable(coffee.getPrice()).ifPresent(price -> findCoffee.setPrice(price));
-
-        return coffeeRepository.save(findCoffee);
+        Coffee updatedCoffee = beanUtils.copyNonNullProperties(coffee, findCoffee);
+        return coffeeRepository.save(updatedCoffee);
     }
 
     public Coffee findCoffee(long coffeeId) {
