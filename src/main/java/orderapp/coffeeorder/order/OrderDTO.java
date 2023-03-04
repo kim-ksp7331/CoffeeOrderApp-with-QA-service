@@ -3,8 +3,6 @@ package orderapp.coffeeorder.order;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import orderapp.coffeeorder.coffee.Coffee;
-import orderapp.coffeeorder.member.entity.Member;
 import orderapp.coffeeorder.order.entity.Order;
 
 import javax.validation.Valid;
@@ -18,25 +16,12 @@ public class OrderDTO {
         private long memberId;
         @Valid
         private List<OrderCoffee> orderCoffees;
-
-        public Member getMember() {
-            Member member = new Member();
-            member.setMemberId(memberId);
-            return member;
-        }
-
         @Getter
         public static class OrderCoffee {
             @Positive
             private long coffeeId;
             @Positive
             private int quantity;
-
-            public Coffee getCoffee() {
-                Coffee coffee = new Coffee();
-                coffee.setCoffeeId(coffeeId);
-                return coffee;
-            }
         }
     }
 

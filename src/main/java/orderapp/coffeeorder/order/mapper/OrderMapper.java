@@ -5,12 +5,15 @@ import orderapp.coffeeorder.order.entity.Order;
 import orderapp.coffeeorder.order.entity.OrderCoffee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface OrderMapper {
+public interface OrderMapper{
+    @Mapping(target = "coffee.coffeeId", source = "coffeeId")
+    OrderCoffee orderPostDTOOrderCoffeeToOrderCoffee(OrderDTO.Post.OrderCoffee postOrderCoffee);
+
+    @Mapping(target = "member.memberId", source = "memberId")
     Order orderPostDTOToOrder(OrderDTO.Post orderPostDTO);
 
     Order orderPatchDTOToOrder(OrderDTO.Patch orderPatchDTO);
@@ -25,6 +28,5 @@ public interface OrderMapper {
     OrderDTO.Response orderToOrderResponseDTO(Order order);
 
     List<OrderDTO.Response> ordersToOrderResponseDTOs(List<Order> orders);
-
 
 }
