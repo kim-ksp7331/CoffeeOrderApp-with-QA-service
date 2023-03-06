@@ -6,6 +6,7 @@ import orderapp.coffeeorder.exception.ExceptionCode;
 import orderapp.coffeeorder.member.MemberService;
 import orderapp.coffeeorder.question.entity.Question;
 import orderapp.coffeeorder.question.repository.QuestionRepository;
+import orderapp.coffeeorder.utils.CustomBeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,27 +18,60 @@ import java.util.Optional;
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final MemberService memberService;
+    private final CustomBeanUtils<Question> beanUtils;
 
     public Question createQuestion(Question question) {
         memberService.findVerifiedMember(question.getMember().getMemberId());
         return questionRepository.save(question);
     }
 
-    public Question findQuestion(long questionId, Long memberId) {
-        Question verifiedQuestion = findVerifiedQuestion(questionId);
-        verifySecretQuestionAccessible(memberId, verifiedQuestion);
-        return verifiedQuestion;
+    public Question updateQuestion(Question question) {
+        Question findQuestion = findVerifiedQuestion(question.getQuestionId());
+        verifyAccessibleMember(question.getMember().getMemberId(), findQuestion.getMember().getMemberId());
+        Question updatedQuestion = beanUtils.copyNonNullProperties(question, findQuestion);
+        return questionRepository.save(updatedQuestion);
     }
 
-    private void verifySecretQuestionAccessible(Long memberId, Question verifiedQuestion) {
-        if (verifiedQuestion.getQuestionAccess() == Question.QuestionAccess.SECRET
-                && verifiedQuestion.getMember().getMemberId() != memberId) {
+    public Question findQuestion(long questionId, Long memberId) {
+        Question findQuestion = findVerifiedQuestion(questionId);
+        verifyAccessibleSecretQuestion(memberId, findQuestion);
+        return findQuestion;
+    }
+
+    public void deleteQuestion(long questionId, long memberId) {
+        Question findQuestion = findVerifiedQuestion(questionId);
+        verifyAccessibleMember(memberId, findQuestion.getMember().getMemberId());
+        if (findQuestion.getQuestionStatus() == Question.QuestionStatus.QUESTION_DELETED) {
+            throw new BusinessLogicException(ExceptionCode.CANNOT_DELETE_QUESTION);
+        }
+        findQuestion.setQuestionStatus(Question.QuestionStatus.QUESTION_DELETED);
+    }
+
+
+    public Question findVerifiedQuestion(long questionId) {
+        Optional<Question> optionalQuestion = questionRepository.findByQuestionIdWithAnswerNotDeleted(questionId);
+        Question question = optionalQuestion.orElseThrow(() -> new BusinessLogicException(ExceptionCode.QUESTION_NOT_FOUND));
+        verifyDeletedQuestion(question);
+        return question;
+    }
+
+    private void verifyAccessibleMember(long memberId, long findMemberId) {
+        if (memberId != findMemberId) {
             throw new BusinessLogicException(ExceptionCode.CANNOT_ACCESS_QUESTION);
         }
     }
 
-    public Question findVerifiedQuestion(long questionId) {
-        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
-        return optionalQuestion.orElseThrow(() -> new BusinessLogicException(ExceptionCode.QUESTION_NOT_FOUND));
+    private void verifyAccessibleSecretQuestion(Long memberId, Question findQuestion) {
+        if (findQuestion.getQuestionAccess() == Question.QuestionAccess.SECRET
+                && findQuestion.getMember().getMemberId() != memberId) {
+            throw new BusinessLogicException(ExceptionCode.CANNOT_ACCESS_QUESTION);
+        }
     }
+
+    private void verifyDeletedQuestion(Question question) {
+        if (question.getQuestionStatus() == Question.QuestionStatus.QUESTION_DELETED) {
+            throw new BusinessLogicException(ExceptionCode.QUESTION_DELETED);
+        }
+    }
+
 }

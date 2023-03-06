@@ -18,10 +18,7 @@ public interface OrderMapper{
 
     Order orderPatchDTOToOrder(OrderDTO.Patch orderPatchDTO);
 
-    @Mapping(source = "coffee.coffeeId", target = "coffeeId")
-    @Mapping(source = "coffee.korName", target = "korName")
-    @Mapping(source = "coffee.engName", target = "engName")
-    @Mapping(source = "coffee.price", target = "price")
+    @Mapping(source = "coffee", target = ".")
     OrderDTO.Response.OrderCoffee orderCoffeeToResponseOrderCoffee(OrderCoffee orderCoffee);
 
     @Mapping(source = "member.memberId", target = "memberId")

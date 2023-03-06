@@ -26,8 +26,7 @@ public class Question extends Auditable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private QuestionAccess questionAccess = QuestionAccess.PUBLIC;
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @JoinColumn(name = "ANSWER_ID")
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "question")
     private Answer answer;
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
@@ -35,6 +34,10 @@ public class Question extends Auditable {
 
     public void addAnswer(Answer answer) {
         this.answer = answer;
+    }
+
+    public boolean hasAnswer() {
+        return answer != null && answer.getAnswerStatus() != Answer.AnswerStatus.ANSWER_DELETED;
     }
 
     public void addMember(Member member) {
@@ -45,7 +48,7 @@ public class Question extends Auditable {
     public enum QuestionStatus {
         QUESTION_REGISTRATION("질문 등록"),
         QUESTION_ANSWERED("답변 완료"),
-        QUESTION_DELETE("질문 삭제");
+        QUESTION_DELETED("질문 삭제");
         @Getter
         private String status;
 

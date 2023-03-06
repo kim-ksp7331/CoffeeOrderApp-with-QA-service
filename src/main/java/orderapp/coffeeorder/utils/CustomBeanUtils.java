@@ -4,7 +4,9 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.ManyToOne;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
 
 @Component
@@ -16,7 +18,9 @@ public class CustomBeanUtils<T> {
 
         for (Field field : source.getClass().getDeclaredFields()) {
             Object sourceField = src.getPropertyValue(field.getName());
-            if (sourceField != null && !(sourceField instanceof Collection<?>)) {
+            boolean isJoinEntity = Arrays.stream(field.getDeclaredAnnotations())
+                    .anyMatch(annotation -> annotation instanceof ManyToOne);
+            if (sourceField != null && !(sourceField instanceof Collection<?>) && !isJoinEntity) {
                 dest.setPropertyValue(field.getName(), sourceField);
             }
         }

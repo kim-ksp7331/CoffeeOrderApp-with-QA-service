@@ -3,6 +3,7 @@ package orderapp.coffeeorder.question.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import orderapp.coffeeorder.question.entity.Question;
 import orderapp.coffeeorder.validator.NotSpace;
 
@@ -24,6 +25,7 @@ public class QuestionDTO {
 
     @Getter
     public static class Patch {
+        @Setter
         private long questionId;
         @Positive
         private int memberId;
@@ -38,11 +40,11 @@ public class QuestionDTO {
     @AllArgsConstructor
     public static class Response {
         private long questionId;
+        private long memberId;
         private String title;
         private String content;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String answer;
-        private String author;
         private Question.QuestionStatus questionStatus;
         private Question.QuestionAccess questionAccess;
 

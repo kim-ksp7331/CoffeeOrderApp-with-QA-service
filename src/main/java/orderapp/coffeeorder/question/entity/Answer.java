@@ -20,12 +20,13 @@ public class Answer extends Auditable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AnswerStatus answerStatus = AnswerStatus.ANSWER_REGISTRATION;
-    @OneToOne(mappedBy = "answer")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "QUESTION_ID")
     private Question question;
 
     public enum AnswerStatus {
         ANSWER_REGISTRATION("답변 등록"),
-        ANSWER_DELETE("답변 삭제");
+        ANSWER_DELETED("답변 삭제");
         @Getter
         private String status;
 

@@ -15,6 +15,6 @@ public interface QuestionMapper{
     Question questionPatchDTOToQuestion(QuestionDTO.Patch questionPatchDTO);
 
     @Mapping(source = "answer.content", target = "answer")
-    @Mapping(source = "member.name", target = "author")
+    @Mapping(source = "member.memberId", target = "memberId")
     QuestionDTO.Response questionToQuestionResponseDTO(Question question);
 }

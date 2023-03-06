@@ -9,4 +9,9 @@ import org.mapstruct.Mapping;
 public interface AnswerMapper {
     @Mapping(target = "question.questionId", source = "questionId")
     Answer answerPostDTOToAnswer(AnswerDTO.Post answerPostDTO);
+    @Mapping(target = "question.questionId", source = "questionId")
+    Answer answerPatchDTOToAnswer(AnswerDTO.Patch answerPatchDTO);
+
+    @Mapping(source = "question.questionId", target = "questionId")
+    AnswerDTO.Response answerToAnswerResponseDTO(Answer answer);
 }
