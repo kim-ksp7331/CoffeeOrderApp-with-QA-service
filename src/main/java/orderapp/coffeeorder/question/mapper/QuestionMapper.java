@@ -5,6 +5,8 @@ import orderapp.coffeeorder.question.entity.Question;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface QuestionMapper{
     @Mapping(target = "member.memberId", source = "memberId")
@@ -17,4 +19,6 @@ public interface QuestionMapper{
     @Mapping(source = "answer.content", target = "answer")
     @Mapping(source = "member.memberId", target = "memberId")
     QuestionDTO.Response questionToQuestionResponseDTO(Question question);
+
+    List<QuestionDTO.Response> questionsToQuestionResponseDTOs(List<Question> questions);
 }

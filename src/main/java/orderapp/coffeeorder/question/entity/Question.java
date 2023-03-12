@@ -3,6 +3,7 @@ package orderapp.coffeeorder.question.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import orderapp.coffeeorder.audit.Auditable;
 import orderapp.coffeeorder.member.entity.Member;
 
@@ -12,6 +13,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @Entity
+@ToString
 public class Question extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

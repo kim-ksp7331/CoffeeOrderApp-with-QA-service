@@ -7,6 +7,9 @@ import orderapp.coffeeorder.member.MemberService;
 import orderapp.coffeeorder.question.entity.Question;
 import orderapp.coffeeorder.question.repository.QuestionRepository;
 import orderapp.coffeeorder.utils.CustomBeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,11 @@ public class QuestionService {
         Question findQuestion = findVerifiedQuestion(questionId);
         verifyAccessibleSecretQuestion(memberId, findQuestion);
         return findQuestion;
+    }
+
+    public Page<Question> findQuestions(int page, int size, Sort.Direction direction) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        return questionRepository.findAllByPublicWithAnswerNotDeleted(pageRequest);
     }
 
     public void deleteQuestion(long questionId, long memberId) {
