@@ -45,6 +45,7 @@ public class QuestionDTO {
         private String content;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String answer;
+        private int views;
         private Question.QuestionStatus questionStatus;
         private Question.QuestionAccess questionAccess;
 

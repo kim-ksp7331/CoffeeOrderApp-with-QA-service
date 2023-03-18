@@ -38,11 +38,12 @@ public class QuestionService {
     public Question findQuestion(long questionId, Long memberId) {
         Question findQuestion = findVerifiedQuestion(questionId);
         verifyAccessibleSecretQuestion(memberId, findQuestion);
+        findQuestion.setViews(findQuestion.getViews() + 1);
         return findQuestion;
     }
 
-    public Page<Question> findQuestions(int page, int size, Sort.Direction direction) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+    public Page<Question> findQuestions(int page, int size, Question.QuestionOrder questionOrder, Sort.Direction direction) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, questionOrder.getFieldName()));
         return questionRepository.findAllByPublicWithAnswerNotDeleted(pageRequest);
     }
 

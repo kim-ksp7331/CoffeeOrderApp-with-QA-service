@@ -59,8 +59,9 @@ public class QuestionController {
     @GetMapping
     public ResponseEntity<?> getQuestions(@RequestParam @Positive int page,
                                           @RequestParam @Positive int size,
+                                          @RequestParam(defaultValue = "CREATED_AT") Question.QuestionOrder order,
                                           @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
-        Page<Question> questionPage = questionService.findQuestions(page - 1, size, direction);
+        Page<Question> questionPage = questionService.findQuestions(page - 1, size, order, direction);
         List<Question> questions = questionPage.getContent();
         List<QuestionDTO.Response> responses = mapper.questionsToQuestionResponseDTOs(questions);
         return new ResponseEntity<>(new MultiResponseDTO<>(responses, questionPage), HttpStatus.OK);

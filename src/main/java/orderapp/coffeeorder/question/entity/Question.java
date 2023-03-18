@@ -22,6 +22,8 @@ public class Question extends Auditable {
     private String title;
     @Column(nullable = false, length = 2000)
     private String content;
+    @Column(nullable = false)
+    private int views;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private QuestionStatus questionStatus = QuestionStatus.QUESTION_REGISTRATION;
@@ -66,6 +68,16 @@ public class Question extends Auditable {
 
         QuestionAccess(String accessLevel) {
             this.accessLevel = accessLevel;
+        }
+    }
+
+    public enum QuestionOrder {
+        CREATED_AT("createdAt"), VIEWS("views");
+        @Getter
+        private String fieldName;
+
+        QuestionOrder(String fieldName) {
+            this.fieldName = fieldName;
         }
     }
 }
