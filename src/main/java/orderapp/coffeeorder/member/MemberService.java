@@ -1,6 +1,7 @@
 package orderapp.coffeeorder.member;
 
 import lombok.RequiredArgsConstructor;
+import orderapp.coffeeorder.auth.util.CustomAuthorityUtils;
 import orderapp.coffeeorder.exception.BusinessLogicException;
 import orderapp.coffeeorder.exception.ExceptionCode;
 import orderapp.coffeeorder.member.entity.Member;
@@ -9,6 +10,7 @@ import orderapp.coffeeorder.utils.CustomBeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +22,16 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final CustomBeanUtils<Member> beanUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomAuthorityUtils authorityUtils;
 
     public Member createMember(Member member) {
         verifyExistsEmail(member.getEmail());
         setStamp(member);
-        return memberRepository.save(member);
-    }
+        setPassword(member);
+        setRoles(member);
 
-    private void setStamp(Member member) {
-        member.setStamp(new Stamp());
+        return memberRepository.save(member);
     }
 
     public Member updateMember(Member member) {
@@ -54,6 +57,20 @@ public class MemberService {
     public Member findVerifiedMember(long memberId) {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         return optionalMember.orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+    }
+
+    private void setStamp(Member member) {
+        member.setStamp(new Stamp());
+    }
+
+    private void setPassword(Member member) {
+        String password = member.getPassword();
+        String encodedPassword = passwordEncoder.encode(password);
+        member.setPassword(encodedPassword);
+    }
+
+    private void setRoles(Member member) {
+        member.setRoles(authorityUtils.getRoles(member.getEmail()));
     }
 
     private void verifyExistsEmail(String email) {

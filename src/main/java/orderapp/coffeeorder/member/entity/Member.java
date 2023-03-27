@@ -24,6 +24,11 @@ public class Member extends Auditable {
     private String name;
     @Column(nullable = false, unique = true, length = 13)
     private String phone;
+    @Column(nullable = false, length = 100)
+    private String password;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private MemberStatus memberStatus = MemberStatus.MEMBER_ACTIVE;

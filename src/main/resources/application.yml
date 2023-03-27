@@ -24,7 +24,10 @@ spring:
         format_sql: true
         highlight_sql: true
         color-codes: true
-
+server:
+  servlet:
+    encoding:
+      force-response: true
 logging:
   level:
     org:
@@ -32,3 +35,10 @@ logging:
         type:
           descriptor:
             sql: trace
+email:
+  address:
+    admin: ksp7331@gmail.com
+jwt:
+  key: ${JWT_SECRET_KEY}
+  access-token-expiration-minutes: 30
+  refresh-token-expiration-minutes: 420
