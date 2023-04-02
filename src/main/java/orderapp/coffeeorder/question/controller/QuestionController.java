@@ -6,11 +6,13 @@ import orderapp.coffeeorder.question.mapper.QuestionMapper;
 import orderapp.coffeeorder.question.service.QuestionService;
 import orderapp.coffeeorder.response.MultiResponseDTO;
 import orderapp.coffeeorder.response.SingleResponseDTO;
+import orderapp.coffeeorder.utils.AuthenticationUtils;
 import orderapp.coffeeorder.utils.UriCreator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +28,19 @@ public class QuestionController {
     private final static String Question_DEFAULT_URL = "/questions";
     private final QuestionService questionService;
     private final QuestionMapper mapper;
+    private final AuthenticationUtils authenticationUtils;
 
-    public QuestionController(QuestionService questionService, QuestionMapper mapper) {
+    public QuestionController(QuestionService questionService, QuestionMapper mapper, AuthenticationUtils authenticationUtils) {
         this.questionService = questionService;
         this.mapper = mapper;
+        this.authenticationUtils = authenticationUtils;
     }
 
     @PostMapping
-    public ResponseEntity<?> postQuestion(@Valid @RequestBody QuestionDTO.Post questionPostDTO) {
+    public ResponseEntity<?> postQuestion(@Valid @RequestBody QuestionDTO.Post questionPostDTO,
+                                          Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
+        questionPostDTO.setMemberId(memberId);
         Question question = questionService.createQuestion(mapper.questionPostDTOToQuestion(questionPostDTO));
         URI location = UriCreator.createUri(Question_DEFAULT_URL, question.getQuestionId());
         return ResponseEntity.created(location).build();
@@ -41,7 +48,10 @@ public class QuestionController {
 
     @PatchMapping("/{question-id}")
     public ResponseEntity<?> patchQuestion(@PathVariable("question-id") @Positive long questionId,
-                                           @Valid @RequestBody QuestionDTO.Patch questionPatchDTO) {
+                                           @Valid @RequestBody QuestionDTO.Patch questionPatchDTO,
+                                           Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
+        questionPatchDTO.setMemberId(memberId);
         questionPatchDTO.setQuestionId(questionId);
         Question question = questionService.updateQuestion(mapper.questionPatchDTOToQuestion(questionPatchDTO));
         QuestionDTO.Response response = mapper.questionToQuestionResponseDTO(question);
@@ -50,7 +60,8 @@ public class QuestionController {
 
     @GetMapping("/{question-id}")
     public ResponseEntity<?> getQuestion(@PathVariable("question-id") @Positive long questionId,
-                                         @RequestParam(required = false) @Positive Long memberId) {
+                                         Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
         Question question = questionService.findQuestion(questionId, memberId);
         QuestionDTO.Response response = mapper.questionToQuestionResponseDTO(question);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
@@ -69,7 +80,8 @@ public class QuestionController {
 
     @DeleteMapping("/{question-id}")
     public ResponseEntity<?> deleteQuestion(@PathVariable("question-id") @Positive long questionId,
-                                            @RequestParam @Positive long memberId) {
+                                            Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
         questionService.deleteQuestion(questionId, memberId);
         return ResponseEntity.noContent().build();
     }

@@ -13,7 +13,8 @@ public class OrderDTO {
     @Getter
     public static class Post {
         @Positive
-        private long memberId;
+        @Setter
+        private Long memberId;
         @Valid
         private List<OrderCoffee> orderCoffees;
         @Getter
@@ -29,6 +30,9 @@ public class OrderDTO {
     public static class Patch {
         @Setter
         private long orderId;
+        @Setter
+        @Positive
+        private Long memberId;
         private Order.OrderStatus orderStatus;
     }
 

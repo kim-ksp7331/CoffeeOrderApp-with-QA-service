@@ -4,10 +4,12 @@ import orderapp.coffeeorder.order.entity.Order;
 import orderapp.coffeeorder.order.mapper.OrderMapper;
 import orderapp.coffeeorder.response.MultiResponseDTO;
 import orderapp.coffeeorder.response.SingleResponseDTO;
+import orderapp.coffeeorder.utils.AuthenticationUtils;
 import orderapp.coffeeorder.utils.UriCreator;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,14 +25,19 @@ public class OrderController {
     private final static String ORDER_DEFAULT_URL = "/orders";
     private final OrderService orderService;
     private final OrderMapper mapper;
+    private final AuthenticationUtils authenticationUtils;
 
-    public OrderController(OrderService orderService, OrderMapper mapper) {
+    public OrderController(OrderService orderService, OrderMapper mapper, AuthenticationUtils authenticationUtils) {
         this.orderService = orderService;
         this.mapper = mapper;
+        this.authenticationUtils = authenticationUtils;
     }
 
     @PostMapping
-    public ResponseEntity<?> postOrder(@Valid @RequestBody OrderDTO.Post orderPostDTO) {
+    public ResponseEntity<?> postOrder(@Valid @RequestBody OrderDTO.Post orderPostDTO,
+                                       Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
+        orderPostDTO.setMemberId(memberId);
         Order order = orderService.createOrder(mapper.orderPostDTOToOrder(orderPostDTO));
         URI location = UriCreator.createUri(ORDER_DEFAULT_URL, order.getOrderId());
         return ResponseEntity.created(location).build();
@@ -38,7 +45,10 @@ public class OrderController {
 
     @PatchMapping("/{order-id}")
     public ResponseEntity<?> patchOrder(@PathVariable("order-id") @Positive long orderId,
-                                        @Valid @RequestBody OrderDTO.Patch orderPatchDTO) {
+                                        @Valid @RequestBody OrderDTO.Patch orderPatchDTO,
+                                        Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
+        orderPatchDTO.setMemberId(memberId);
         orderPatchDTO.setOrderId(orderId);
         Order order = orderService.updateOrder(mapper.orderPatchDTOToOrder(orderPatchDTO));
         OrderDTO.Response response = mapper.orderToOrderResponseDTO(order);
@@ -46,8 +56,10 @@ public class OrderController {
     }
 
     @GetMapping("/{order-id}")
-    public ResponseEntity<?> getOrder(@PathVariable("order-id") @Positive long orderId) {
-        Order order = orderService.findOrder(orderId);
+    public ResponseEntity<?> getOrder(@PathVariable("order-id") @Positive long orderId,
+                                      Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
+        Order order = orderService.findOrder(orderId, memberId);
         OrderDTO.Response response = mapper.orderToOrderResponseDTO(order);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
@@ -61,8 +73,10 @@ public class OrderController {
     }
 
     @DeleteMapping("/{order-id}")
-    public ResponseEntity<?> cancelOrder(@PathVariable("order-id") @Positive long orderId) {
-        orderService.cancelOrder(orderId);
+    public ResponseEntity<?> cancelOrder(@PathVariable("order-id") @Positive long orderId,
+                                         Authentication authentication) {
+        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
+        orderService.cancelOrder(orderId, memberId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

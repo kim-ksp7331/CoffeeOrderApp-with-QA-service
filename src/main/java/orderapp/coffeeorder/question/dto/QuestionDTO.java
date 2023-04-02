@@ -15,7 +15,8 @@ public class QuestionDTO {
     @Getter
     public static class Post {
         @Positive
-        private int memberId;
+        @Setter
+        private Long memberId;
         @NotBlank(message = "제목은 공백이 아니어야 합니다.")
         private String title;
         @NotBlank(message = "내용은 공백이 아니어야 합니다.")
@@ -28,7 +29,8 @@ public class QuestionDTO {
         @Setter
         private long questionId;
         @Positive
-        private int memberId;
+        @Setter
+        private Long memberId;
         @NotSpace(message = "제목은 공백이 아니어야 합니다.")
         private String title;
         @NotSpace(message = "내용은 공백이 아니어야 합니다.")

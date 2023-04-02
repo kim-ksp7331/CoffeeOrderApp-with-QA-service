@@ -30,7 +30,6 @@ public class AnswerController {
     public ResponseEntity<?> postAnswer(@PathVariable("question-id") @Positive long questionId,
                                         @Valid @RequestBody AnswerDTO.Post answerPostDTO) {
         answerPostDTO.setQuestionId(questionId);
-        if (!answerPostDTO.getEmail().equals("admin@gmail.com")) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         answerService.createAnswer(mapper.answerPostDTOToAnswer(answerPostDTO));
         return ResponseEntity.ok().build();
     }
@@ -39,16 +38,13 @@ public class AnswerController {
     public ResponseEntity<?> patchAnswer(@PathVariable("question-id") @Positive long questionId,
                                          @Valid @RequestBody AnswerDTO.Patch answerPatchDTO) {
         answerPatchDTO.setQuestionId(questionId);
-        if (!answerPatchDTO.getEmail().equals("admin@gmail.com")) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         Answer answer = answerService.updateAnswer(mapper.answerPatchDTOToAnswer(answerPatchDTO));
         AnswerDTO.Response response = mapper.answerToAnswerResponseDTO(answer);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteAnswer(@PathVariable("question-id") @Positive long questionId,
-                                          @RequestParam String email) {
-        if (!email.equals("admin@gmail.com")) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> deleteAnswer(@PathVariable("question-id") @Positive long questionId) {
         answerService.deleteAnswer(questionId);
         return ResponseEntity.noContent().build();
     }

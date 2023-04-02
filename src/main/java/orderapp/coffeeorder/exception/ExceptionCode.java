@@ -11,7 +11,6 @@ public enum ExceptionCode {
     CANNOT_CHANGE_ORDER(403, "Order Cannot Change"),
     QUESTION_NOT_FOUND(404, "Question Not Found"),
     QUESTION_DELETED(404, "Question Deleted"),
-    CANNOT_ACCESS_QUESTION(403, "Cannot Access Question"),
     CANNOT_DELETE_QUESTION(403, "Cannot Delete Question"),
     CANNOT_DELETE_ANSWER(403, "Cannot Delete Answer"),
     ANSWER_NOT_FOUND(404, "Answer Not Found"),

@@ -15,7 +15,7 @@ public interface OrderMapper{
 
     @Mapping(target = "member.memberId", source = "memberId")
     Order orderPostDTOToOrder(OrderDTO.Post orderPostDTO);
-
+    @Mapping(target = "member.memberId", source = "memberId")
     Order orderPatchDTOToOrder(OrderDTO.Patch orderPatchDTO);
 
     @Mapping(source = "coffee", target = ".")

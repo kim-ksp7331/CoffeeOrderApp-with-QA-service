@@ -12,7 +12,6 @@ public class AnswerDTO {
     public static class Post {
         @Setter
         private long questionId;
-        private String email;
         @NotNull
         private String content;
     }
@@ -20,7 +19,6 @@ public class AnswerDTO {
     public static class Patch {
         @Setter
         private long questionId;
-        private String email;
         private String content;
     }
 

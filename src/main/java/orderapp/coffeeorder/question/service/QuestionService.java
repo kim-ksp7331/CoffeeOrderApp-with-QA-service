@@ -10,6 +10,7 @@ import orderapp.coffeeorder.utils.CustomBeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,14 +67,14 @@ public class QuestionService {
 
     private void verifyAccessibleMember(long memberId, long findMemberId) {
         if (memberId != findMemberId) {
-            throw new BusinessLogicException(ExceptionCode.CANNOT_ACCESS_QUESTION);
+            throw new AccessDeniedException("Access Denied");
         }
     }
 
     private void verifyAccessibleSecretQuestion(Long memberId, Question findQuestion) {
         if (findQuestion.getQuestionAccess() == Question.QuestionAccess.SECRET
                 && findQuestion.getMember().getMemberId() != memberId) {
-            throw new BusinessLogicException(ExceptionCode.CANNOT_ACCESS_QUESTION);
+            throw new AccessDeniedException("Access Denied");
         }
     }
 
