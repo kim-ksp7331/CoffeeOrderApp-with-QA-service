@@ -54,7 +54,7 @@ public class MemberController {
     @GetMapping("/{member-id}")
     public ResponseEntity<?> getMember(@PathVariable("member-id") @Positive long memberId,
                                        Authentication authentication) {
-        authenticationUtils.verifyMemberId(authentication, memberId);
+        authenticationUtils.verifyMemberIdForUser(authentication, memberId);
         Member member = memberService.findMember(memberId);
         MemberDTO.Response response = mapper.memberToMemberResponseDTO(member);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);

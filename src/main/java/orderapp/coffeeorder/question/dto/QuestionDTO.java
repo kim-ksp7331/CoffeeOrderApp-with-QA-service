@@ -28,9 +28,6 @@ public class QuestionDTO {
     public static class Patch {
         @Setter
         private long questionId;
-        @Positive
-        @Setter
-        private Long memberId;
         @NotSpace(message = "제목은 공백이 아니어야 합니다.")
         private String title;
         @NotSpace(message = "내용은 공백이 아니어야 합니다.")

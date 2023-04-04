@@ -30,9 +30,6 @@ public class OrderDTO {
     public static class Patch {
         @Setter
         private long orderId;
-        @Setter
-        @Positive
-        private Long memberId;
         private Order.OrderStatus orderStatus;
     }
 

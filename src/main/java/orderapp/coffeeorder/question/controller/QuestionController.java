@@ -50,10 +50,8 @@ public class QuestionController {
     public ResponseEntity<?> patchQuestion(@PathVariable("question-id") @Positive long questionId,
                                            @Valid @RequestBody QuestionDTO.Patch questionPatchDTO,
                                            Authentication authentication) {
-        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
-        questionPatchDTO.setMemberId(memberId);
         questionPatchDTO.setQuestionId(questionId);
-        Question question = questionService.updateQuestion(mapper.questionPatchDTOToQuestion(questionPatchDTO));
+        Question question = questionService.updateQuestion(mapper.questionPatchDTOToQuestion(questionPatchDTO), authentication);
         QuestionDTO.Response response = mapper.questionToQuestionResponseDTO(question);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
@@ -61,8 +59,7 @@ public class QuestionController {
     @GetMapping("/{question-id}")
     public ResponseEntity<?> getQuestion(@PathVariable("question-id") @Positive long questionId,
                                          Authentication authentication) {
-        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
-        Question question = questionService.findQuestion(questionId, memberId);
+        Question question = questionService.findQuestion(questionId, authentication);
         QuestionDTO.Response response = mapper.questionToQuestionResponseDTO(question);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
@@ -82,7 +79,7 @@ public class QuestionController {
     public ResponseEntity<?> deleteQuestion(@PathVariable("question-id") @Positive long questionId,
                                             Authentication authentication) {
         Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
-        questionService.deleteQuestion(questionId, memberId);
+        questionService.deleteQuestion(questionId, authentication);
         return ResponseEntity.noContent().build();
     }
 }

@@ -47,10 +47,8 @@ public class OrderController {
     public ResponseEntity<?> patchOrder(@PathVariable("order-id") @Positive long orderId,
                                         @Valid @RequestBody OrderDTO.Patch orderPatchDTO,
                                         Authentication authentication) {
-        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
-        orderPatchDTO.setMemberId(memberId);
         orderPatchDTO.setOrderId(orderId);
-        Order order = orderService.updateOrder(mapper.orderPatchDTOToOrder(orderPatchDTO));
+        Order order = orderService.updateOrder(mapper.orderPatchDTOToOrder(orderPatchDTO), authentication);
         OrderDTO.Response response = mapper.orderToOrderResponseDTO(order);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
@@ -58,8 +56,7 @@ public class OrderController {
     @GetMapping("/{order-id}")
     public ResponseEntity<?> getOrder(@PathVariable("order-id") @Positive long orderId,
                                       Authentication authentication) {
-        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
-        Order order = orderService.findOrder(orderId, memberId);
+        Order order = orderService.findOrder(orderId, authentication);
         OrderDTO.Response response = mapper.orderToOrderResponseDTO(order);
         return new ResponseEntity<>(new SingleResponseDTO<>(response), HttpStatus.OK);
     }
@@ -75,8 +72,7 @@ public class OrderController {
     @DeleteMapping("/{order-id}")
     public ResponseEntity<?> cancelOrder(@PathVariable("order-id") @Positive long orderId,
                                          Authentication authentication) {
-        Long memberId = authenticationUtils.getMemberIdFromAuthentication(authentication);
-        orderService.cancelOrder(orderId, memberId);
+        orderService.cancelOrder(orderId, authentication);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
